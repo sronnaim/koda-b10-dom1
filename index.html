@@ -6,93 +6,78 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <meta name='description' content='Convert from anything to anything'>
     <title>Temperature Conversion</title>
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
     <main>
-        <label for="from-select">From</label>
-        <select id="from-select">
-            <option value="c">Celsius</option>
-        </select>
-        <label for="to-select">To</label>
-        <select id="to-select">
-            <option value="f">Fahrenheit</option>
-            <option value="k">Kelvin</option>
-            <option value="re">Réamur</option>
-        </select>
-        <input id="deg-input" type="number" placeholder="Enter a number">
-        <p>
-            Result:
-            <span id="result"></span>
-            <span id="result-scale"></span>
-        </p>
+        <h1>Temperature Unit Converter</h1>
+        <div id="from">
+            <select name="from-scale" id="from-select">
+                <option value="c">Celsius °C</option>
+            </select>
+            <input type="number" name="from-value" id="from-input" placeholder="0">
+        </div>
+        <div id="to">
+            <input type="number" name="to-scale" id="to-input" placeholder="32">
+            <select name="to-value" id="to-select">
+                <option value="f">Fahrenheit °F</option>
+                <option value="k">Kelvin °K</option>
+                <option value="re">Réamur °Ré</option>
+            </select>
+        </div>
     </main>
 
     <script>
-        let from = "c"
-        let to = "f"
-        let input
-        let result
+        let from = 'c'
+        let to = 'f'
+        let fromValue
+        let toValue
 
-        const fromEl = document.getElementById("from-select")
-        const toEl = document.getElementById("to-select")
-        const resEl = document.querySelector("#result")
-        const resScaleEl = document.querySelector("#result-scale")
-        const inputEl = document.querySelector("#deg-input")
+        const fromSelect = document.querySelector("#from>select")
+        const fromInput = document.getElementById("from-input")
+        const toSelect = document.querySelector("#to>select")
+        const toInput = document.getElementById("to-input")
 
-        fromEl.value = from
-        toEl.value = to
-        fromEl.addEventListener("change", handleFromChange)
-        toEl.addEventListener("change", handleToChange)
-        inputEl.addEventListener("change", handleInputChange)
+        fromSelect.value = from
+        toSelect.value = to
 
-        refreshResScale()
-        refreshResult()
+        fromSelect.addEventListener("change", handleFromSelectChange)
+        fromInput.addEventListener("change", handleFromInputChange)
+        toSelect.addEventListener("change", handleToSelectChange)
+        toInput.addEventListener("change", handleToInputChange)
 
-        function handleFromChange(event) {
-            from = event.srcElement.value
+        function handleFromSelectChange(e) {
+            from = e.srcElement.value
+            toValue = getResult(fromValue, from, to)
+
+            refreshPage()
         }
 
-        function handleToChange(event) {
-            to = event.srcElement.value
-            refreshResScale()
-            refreshResult()
+        function handleFromInputChange(e) {
+            fromValue = Number(e.srcElement.value)
+            toValue = getResult(fromValue, from, to)
+
+            refreshPage()
         }
 
-        function handleInputChange(event) {
-            input = Number(event.srcElement.value)
+        function handleToSelectChange(e) {
+            to = e.srcElement.value
+            fromValue = getResult(toValue, to, from)
 
-            refreshResScale()
-            refreshResult()
+            refreshPage()
         }
 
-        function refreshResult() {
-            const newResult = getResult(input, from, to)
+        function handleToInputChange(e) {
+            toValue = Number(e.srcElement.value)
+            fromValue = getResult(toValue, to, from)
 
-            if (Number.isNaN(newResult))
-                return resEl.textContent = ""
-
-            resEl.textContent = newResult
-        }
-
-        function refreshResScale() {
-            switch (to) {
-                case 'f':
-                    resScaleEl.textContent = "°F"
-                    break;
-
-                case 're':
-                    resScaleEl.textContent = "°Ré"
-                    break;
-
-                case 'k':
-                    resScaleEl.textContent = "°K"
-                    break;
-
-                default:
-                    resScaleEl.textContent = ""
-                    break;
-            }
+            refreshPage()
         }
 
         function getResult(value, from, to) {
@@ -107,6 +92,28 @@
                 if (to === 'f')
                     return (value * 9 / 5) + 32
             }
+
+            if (from === 'f') {
+                if (to === 'c')
+                    return (value - 32) * 5 / 9
+            }
+
+            if (from === 're') {
+                if (to === 'c')
+                    return value * (5 / 4)
+            }
+
+            if (from === 'k') {
+                if (to === 'c')
+                    return value - 273.15
+            }
+        }
+
+        function refreshPage() {
+            fromSelect.value = from
+            fromInput.value = fromValue
+            toSelect.value = to
+            toInput.value = toValue
         }
     </script>
 </body>
