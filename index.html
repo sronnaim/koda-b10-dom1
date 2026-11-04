@@ -31,6 +31,8 @@
     <script>
         let from = "c"
         let to = "f"
+        let input
+        let result
 
         const fromEl = document.getElementById("from-select")
         const toEl = document.getElementById("to-select")
@@ -45,6 +47,7 @@
         inputEl.addEventListener("change", handleInputChange)
 
         refreshResScale()
+        refreshResult()
 
         function handleFromChange(event) {
             from = event.srcElement.value
@@ -53,14 +56,23 @@
         function handleToChange(event) {
             to = event.srcElement.value
             refreshResScale()
+            refreshResult()
         }
 
         function handleInputChange(event) {
-            const input = Number(event.srcElement.value)
-            const result = getResult(input, from, to)
+            input = Number(event.srcElement.value)
 
             refreshResScale()
-            resEl.textContent = `${result}`
+            refreshResult()
+        }
+
+        function refreshResult() {
+            const newResult = getResult(input, from, to)
+
+            if (Number.isNaN(newResult))
+                return resEl.textContent = ""
+
+            resEl.textContent = newResult
         }
 
         function refreshResScale() {
