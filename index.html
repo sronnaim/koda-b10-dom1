@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <meta name='description' content='Convert from anything to anything'>
+    <title>Temperature Conversion</title>
+</head>
+
+<body>
+    <main>
+        <label for="from-select">From</label>
+        <select id="from-select">
+            <option value="c">Celsius</option>
+        </select>
+        <label for="to-select">To</label>
+        <select id="to-select">
+            <option value="f">Fahrenheit</option>
+            <option value="k">Kelvin</option>
+            <option value="re">Réamur</option>
+        </select>
+        <input id="deg-input" type="number" placeholder="Enter a number">
+        <p>
+            Result:
+            <span id="result"></span>
+            <span id="result-scale"></span>
+        </p>
+    </main>
+
+    <script>
+        let from = "c"
+        let to = "f"
+
+        const fromEl = document.getElementById("from-select")
+        const toEl = document.getElementById("to-select")
+        const resEl = document.querySelector("#result")
+        const resScaleEl = document.querySelector("#result-scale")
+        const inputEl = document.querySelector("#deg-input")
+
+        fromEl.value = from
+        toEl.value = to
+        fromEl.addEventListener("change", handleFromChange)
+        toEl.addEventListener("change", handleToChange)
+        inputEl.addEventListener("change", handleInputChange)
+
+        refreshResScale()
+
+        function handleFromChange(event) {
+            from = event.srcElement.value
+        }
+
+        function handleToChange(event) {
+            to = event.srcElement.value
+            refreshResScale()
+        }
+
+        function handleInputChange(event) {
+            const input = Number(event.srcElement.value)
+            const result = getResult(input, from, to)
+
+            refreshResScale()
+            resEl.textContent = `${result}`
+        }
+
+        function refreshResScale() {
+            switch (to) {
+                case 'f':
+                    resScaleEl.textContent = "°F"
+                    break;
+
+                case 're':
+                    resScaleEl.textContent = "°Ré"
+                    break;
+
+                case 'k':
+                    resScaleEl.textContent = "°K"
+                    break;
+
+                default:
+                    resScaleEl.textContent = ""
+                    break;
+            }
+        }
+
+        function getResult(value, from, to) {
+            if (from === 'c') {
+
+                if (to === 'k')
+                    return value + 273.15
+
+                if (to === 're')
+                    return value * (4 / 5)
+
+                if (to === 'f')
+                    return (value * 9 / 5) + 32
+            }
+        }
+    </script>
+</body>
+
+</html>
