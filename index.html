@@ -16,7 +16,20 @@
 
 <body>
     <main>
-        <h1>Temperature Unit Converter</h1>
+        <span class="heading">
+            <h1>Temperature Unit Converter</h1>
+            <button type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-maximize preview-icon" aria-hidden="true">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                    <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+                    <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+                    <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+                </svg>
+
+            </button>
+        </span>
         <form method="get">
             <div id="from">
                 <select name="from-scale" id="from-select" value="c">
@@ -28,22 +41,37 @@
                 <input type="number" step="any" name="to-value" id="to-input" placeholder="32">
                 <select name="to-scale" id="to-select" value="f">
                     <option value="f">Fahrenheit °F</option>
-                    <option value="k">Kelvin °K</option>
+                    <option value="k">Kelvin K</option>
                     <option value="re">Réamur °Ré</option>
                 </select>
             </div>
             <input type="text" name="updated-field">
-            <button aria-hidden="true"></button>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">°C</th>
+                        <th scope="col">°F</th>
+                        <th scope="col">K</th>
+                        <th scope="col">°Ré</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </form>
     </main>
 
     <script>
+        const queries = [];
+
         const formEl = document.querySelector("form")
         const fromScaleEl = document.querySelector("#from>select")
         const fromValueEl = document.getElementById("from-input")
         const toScaleEl = document.querySelector("#to>select")
         const toValueEl = document.getElementById("to-input")
         const updatedField = document.querySelector('input[name="updated-field"]')
+        const tbodyEl = document.querySelector("tbody")
 
         formEl.addEventListener("submit", handleOnFormSubmit)
         fromScaleEl.addEventListener("change", handleOnFieldChange)
@@ -62,13 +90,70 @@
             const toValue = Number(fd.get("to-value"))
             const updatedField = fd.get("updated-field")
 
+            let result
+
             if (updatedField === "fs" || updatedField === "fv") {
-                const result = getResult(fromValue, fromScale, toScale)
+                result = getResult(fromValue, fromScale, toScale)
                 refreshPage(fromScale, fromValue, toScale, result)
             } else {
-                const result = getResult(toValue, toScale, fromScale)
+                result = getResult(toValue, toScale, fromScale)
                 refreshPage(fromScale, result, toScale, toValue)
             }
+
+            save()
+            renderTable()
+        }
+
+        function createRow(no, c, f, k, re) {
+            const trEl = document.createElement("tr")
+            const noEl = document.createElement("th")
+            noEl.scope = "row"
+            noEl.textContent = no
+
+            const cEl = document.createElement("td")
+            cEl.textContent = c
+
+            const fEl = document.createElement("td")
+            fEl.textContent = f
+
+            const kEl = document.createElement("td")
+            kEl.textContent = k
+
+            const reEl = document.createElement("td")
+            reEl.textContent = re
+
+            trEl.append(noEl, cEl, fEl, kEl, reEl)
+            return trEl
+        }
+
+        function renderTable() {
+            tbodyEl.replaceChildren()
+            queries.forEach((q, i) => tbodyEl.appendChild(createRow(i + 1, Number(q.c).toFixed(3), Number(q.f).toFixed(3), Number(q.k).toFixed(3), Number(q.re).toFixed(3))))
+        }
+
+        function save() {
+            fromScale = fromScaleEl.value
+            fromValue = Number(fromValueEl.value)
+            toScale = toScaleEl.value
+            toValue = Number(toValueEl.value)
+
+            const query = new Map()
+
+            query.set("c", fromValue)
+            if (toScale !== 'f')
+                query.set("f", getResult(fromValue, "c", "f"))
+
+            if (toScale !== 'k')
+                query.set("k", getResult(fromValue, "c", "k"))
+
+            if (toScale !== 're')
+                query.set("re", getResult(fromValue, "c", "re"))
+
+            query.set(toScale, toValue)
+
+            queries.push(Object.fromEntries(query.entries()))
+
+            console.log(queries)
         }
 
         function handleOnFieldChange(e) {
@@ -83,34 +168,6 @@
             }
 
             formEl.requestSubmit()
-        }
-
-        function handleFromSelectChange(e) {
-            from = e.srcElement.value
-            toValue = getResult(fromValue, from, to)
-
-            refreshPage()
-        }
-
-        function handleFromInputChange(e) {
-            fromValue = Number(e.srcElement.value)
-            toValue = getResult(fromValue, from, to)
-
-            refreshPage()
-        }
-
-        function handleToSelectChange(e) {
-            to = e.srcElement.value
-            fromValue = getResult(toValue, to, from)
-
-            refreshPage()
-        }
-
-        function handleToInputChange(e) {
-            toValue = Number(e.srcElement.value)
-            fromValue = getResult(toValue, to, from)
-
-            refreshPage()
         }
 
         function getResult(value, from, to) {

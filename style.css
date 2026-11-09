@@ -31,20 +31,26 @@ main {
     }
 }
 
-h1 {
+.heading {
     top: 0;
     position: absolute;
-    font-size: medium;
-    background-color: black;
+    display: flex;
+    margin-top: 1rem;
+}
+
+.heading h1 {
     box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1),
         0 1px 2px -1px rgb(0 0 0 / 0.1);
     color: white;
-    justify-self: center;
-    margin-top: 1rem;
+    background-color: black;
+    font-size: medium;
     padding: 0.6rem 1.2rem;
     border-radius: 9999px;
-    text-align: center;
-    max-width: fit-content;
+}
+
+.heading button {
+    background-color: red;
+    color: blue;
 }
 
 main>* {
@@ -126,4 +132,25 @@ form {
 
 button {
     display: none;
+}
+
+table {
+    position: fixed;
+    table-layout: fixed;
+    top: 0;
+    left: 0;
+    width: 20rem;
+    background-color: white;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid black;
+}
+
+td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
