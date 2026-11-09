@@ -84,9 +84,28 @@ main input {
     padding: 1rem;
 }
 
+input[name="updated-field"] {
+    display: none;
+}
+
+form {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+}
+
+@media (width >=768px) {
+    form {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 #from {
     background-color: var(--primary);
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
 }
 
 #from>* {
@@ -95,8 +114,16 @@ main input {
 
 #to {
     background-color: azure;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
 }
 
 #to>* {
     color: black;
+}
+
+button {
+    display: none;
 }

@@ -17,40 +17,73 @@
 <body>
     <main>
         <h1>Temperature Unit Converter</h1>
-        <div id="from">
-            <select name="from-scale" id="from-select">
-                <option value="c">Celsius °C</option>
-            </select>
-            <input type="number" name="from-value" id="from-input" placeholder="0">
-        </div>
-        <div id="to">
-            <input type="number" name="to-scale" id="to-input" placeholder="32">
-            <select name="to-value" id="to-select">
-                <option value="f">Fahrenheit °F</option>
-                <option value="k">Kelvin °K</option>
-                <option value="re">Réamur °Ré</option>
-            </select>
-        </div>
+        <form method="get">
+            <div id="from">
+                <select name="from-scale" id="from-select" value="c">
+                    <option value="c">Celsius °C</option>
+                </select>
+                <input type="number" step="any" name="from-value" id="from-input" placeholder="0">
+            </div>
+            <div id="to">
+                <input type="number" step="any" name="to-value" id="to-input" placeholder="32">
+                <select name="to-scale" id="to-select" value="f">
+                    <option value="f">Fahrenheit °F</option>
+                    <option value="k">Kelvin °K</option>
+                    <option value="re">Réamur °Ré</option>
+                </select>
+            </div>
+            <input type="text" name="updated-field">
+            <button aria-hidden="true"></button>
+        </form>
     </main>
 
     <script>
-        let from = 'c'
-        let to = 'f'
-        let fromValue
-        let toValue
+        const formEl = document.querySelector("form")
+        const fromScaleEl = document.querySelector("#from>select")
+        const fromValueEl = document.getElementById("from-input")
+        const toScaleEl = document.querySelector("#to>select")
+        const toValueEl = document.getElementById("to-input")
+        const updatedField = document.querySelector('input[name="updated-field"]')
 
-        const fromSelect = document.querySelector("#from>select")
-        const fromInput = document.getElementById("from-input")
-        const toSelect = document.querySelector("#to>select")
-        const toInput = document.getElementById("to-input")
+        formEl.addEventListener("submit", handleOnFormSubmit)
+        fromScaleEl.addEventListener("change", handleOnFieldChange)
+        fromValueEl.addEventListener("change", handleOnFieldChange)
+        toScaleEl.addEventListener("change", handleOnFieldChange)
+        toValueEl.addEventListener("change", handleOnFieldChange)
 
-        fromSelect.value = from
-        toSelect.value = to
+        function handleOnFormSubmit(e) {
+            e.preventDefault()
 
-        fromSelect.addEventListener("change", handleFromSelectChange)
-        fromInput.addEventListener("change", handleFromInputChange)
-        toSelect.addEventListener("change", handleToSelectChange)
-        toInput.addEventListener("change", handleToInputChange)
+            const fd = new FormData(e.target)
+
+            const fromScale = fd.get("from-scale")
+            const fromValue = Number(fd.get("from-value"))
+            const toScale = fd.get("to-scale")
+            const toValue = Number(fd.get("to-value"))
+            const updatedField = fd.get("updated-field")
+
+            if (updatedField === "fs" || updatedField === "fv") {
+                const result = getResult(fromValue, fromScale, toScale)
+                refreshPage(fromScale, fromValue, toScale, result)
+            } else {
+                const result = getResult(toValue, toScale, fromScale)
+                refreshPage(fromScale, result, toScale, toValue)
+            }
+        }
+
+        function handleOnFieldChange(e) {
+            if (e.target === fromScaleEl)
+                updatedField.value = "fs"
+            else if (e.target === fromValueEl)
+                updatedField.value = "fv"
+            else if (e.target === toScaleEl)
+                updatedField.value = "ts"
+            else {
+                updatedField.value = "tv"
+            }
+
+            formEl.requestSubmit()
+        }
 
         function handleFromSelectChange(e) {
             from = e.srcElement.value
@@ -109,11 +142,11 @@
             }
         }
 
-        function refreshPage() {
-            fromSelect.value = from
-            fromInput.value = fromValue
-            toSelect.value = to
-            toInput.value = toValue
+        function refreshPage(fs, fv, ts, tv) {
+            fromScaleEl.value = fs
+            fromValueEl.value = fv
+            toScaleEl.value = ts
+            toValueEl.value = tv
         }
     </script>
 </body>
